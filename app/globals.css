@@ -1,0 +1,610 @@
+
+@import "tailwindcss";
+
+/* ========================================
+   BASE STYLES
+======================================== */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background: #75A98B;
+  color: #10251B;
+}
+
+/* ========================================
+   GRADIENT TYPOGRAPHY
+======================================== */
+
+.dark-theme .gradient-text {
+  background-image: linear-gradient(
+    110deg,
+    #62D995,
+    #E0FFEB,
+    #72C99C,
+    #B4F5C8,
+    #62D995
+  );
+}
+
+.light-theme .gradient-text {
+  background-image: linear-gradient(
+    110deg,
+    #176B45,
+    #319B68,
+    #123F2D,
+    #55A879,
+    #176B45
+  );
+}
+
+.gradient-text {
+  display: inline-block;
+  padding-block: 0.08em 0.12em;
+  line-height: 1.25;
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: jade-shimmer 6s linear infinite;
+  filter: drop-shadow(0 0 10px rgba(80, 190, 125, 0.16));
+}
+
+.hero-heading {
+  line-height: 1.2;
+  padding-block: 0.06em;
+}
+
+@keyframes jade-shimmer {
+  to {
+    background-position: 200% center;
+  }
+}
+
+/* ========================================
+   BOTTOM SCROLL PROGRESS + MOVING AVATAR
+======================================== */
+
+.scroll-avatar-track {
+  position: fixed;
+  z-index: 110;
+  bottom: 0;
+  left: 45px;
+  right: 45px;
+  height: 95px;
+  pointer-events: none;
+}
+.scroll-avatar-rail,
+.scroll-avatar-fill {
+  position: absolute;
+  bottom: 17px;
+  left: 0;
+  height: 4px;
+  border-radius: 999px;
+}
+
+.scroll-avatar-rail {
+  width: 100%;
+  background: rgba(117, 169, 139, 0.3);
+}
+
+.scroll-avatar-fill {
+  max-width: 100%;
+  background: linear-gradient(
+    90deg,
+    #56866B,
+    #A9D2B2,
+    #D8FFE3
+  );
+  box-shadow: 0 0 12px rgba(117, 169, 139, 0.4);
+}
+
+.scroll-avatar {
+  position: absolute;
+  bottom: 0;
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 3px 9px rgba(0, 0, 0, 0.35));
+  transition: left 0.1s linear;
+}
+
+/* ========================================
+   INTRO SCREEN
+======================================== */
+
+.intro-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  overflow: hidden;
+  isolation: isolate;
+
+  background:
+    radial-gradient(
+      ellipse at 50% 75%,
+      #244b37 0%,
+      transparent 48%
+    ),
+    radial-gradient(
+      ellipse at 15% 15%,
+      #172b25 0%,
+      transparent 45%
+    ),
+    linear-gradient(
+      135deg,
+      #07130f,
+      #10251c 55%,
+      #08140f
+    );
+
+  animation: intro-disappear 0.6s ease 3.5s forwards;
+}
+
+.intro-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+
+  background-image:
+    linear-gradient(
+      rgba(169, 210, 178, 0.07) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(169, 210, 178, 0.07) 1px,
+      transparent 1px
+    );
+
+  background-size: 55px 55px;
+
+  mask-image: linear-gradient(
+    transparent,
+    black 30%,
+    black 80%,
+    transparent
+  );
+
+  animation: grid-move 15s linear infinite;
+}
+
+.intro-screen::after {
+  content: "";
+  position: absolute;
+  width: 450px;
+  height: 450px;
+  border-radius: 50%;
+
+  background: rgba(86, 134, 107, 0.2);
+  filter: blur(100px);
+
+  left: 50%;
+  top: 55%;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+}
+
+/* ========================================
+   INTRO SPEECH BUBBLE
+======================================== */
+
+.speech-bubble {
+  position: absolute;
+  top: 22%;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: max-content;
+  max-width: 90%;
+  padding: 22px 30px;
+
+  border: 1px solid rgba(169, 210, 178, 0.35);
+  border-radius: 20px;
+
+  background: rgba(15, 35, 27, 0.82);
+  backdrop-filter: blur(18px);
+
+  color: #f0f7ef;
+  text-align: center;
+
+  box-shadow: 0 0 40px rgba(117, 169, 139, 0.12);
+
+  animation: bubble-appear 0.7s ease both;
+}
+
+.speech-bubble p {
+  margin: 0 0 7px;
+  font-size: clamp(17px, 2.5vw, 22px);
+  font-weight: 600;
+}
+
+.speech-bubble strong {
+  color: #A9D2B2;
+  font-size: clamp(16px, 2vw, 19px);
+}
+
+/* ========================================
+   INTRO RUNNING AVATAR
+======================================== */
+
+.runner-track {
+  position: absolute;
+  bottom: 12%;
+  left: 0;
+
+  animation: cross-screen 4s linear forwards;
+}
+
+.avatar-sprite {
+  width: 180px;
+  height: 220px;
+
+  background-image: url("/avatar-run.gif");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  filter: drop-shadow(
+    0 0 18px rgba(169, 210, 178, 0.22)
+  );
+}
+
+.runner-track::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 15%;
+
+  width: 130px;
+  height: 12px;
+
+  border-radius: 50%;
+  background: #A9D2B2;
+
+  filter: blur(18px);
+  opacity: 0.45;
+}
+
+/* ========================================
+   INTRO LOADING STATUS
+======================================== */
+
+.intro-status {
+  position: absolute;
+  bottom: 35px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  color: #B4C8B8;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.intro-status::after {
+  content: "";
+  display: block;
+
+  width: 180px;
+  height: 2px;
+  margin: 12px auto 0;
+
+  background: linear-gradient(
+    90deg,
+    #56866B,
+    #D8FFE3
+  );
+
+  transform-origin: left;
+  animation: loading-bar 3.5s linear forwards;
+}
+
+/* ========================================
+   ANIMATIONS
+======================================== */
+
+@keyframes cross-screen {
+  from {
+    transform: translateX(-200px);
+  }
+
+  to {
+    transform: translateX(100vw);
+  }
+}
+
+@keyframes grid-move {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 55px 55px;
+  }
+}
+
+@keyframes bubble-appear {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes loading-bar {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes intro-disappear {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+/* ========================================
+   MOBILE ADJUSTMENTS
+======================================== */
+
+@media (max-width: 480px) {
+  .scroll-avatar-track {
+  position: fixed;
+  z-index: 110;
+  bottom: 0;
+  left: 45px;
+  right: 45px;
+  height: 95px;
+  pointer-events: none;
+}
+
+  .scroll-avatar {
+  position: absolute;
+  bottom: 0;
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 3px 9px rgba(0, 0, 0, 0.35));
+  transition: left 0.1s linear;
+}
+
+  .scroll-avatar-rail,
+  .scroll-avatar-fill {
+    bottom: 13px;
+  }
+
+  .intro-status {
+    font-size: 9px;
+    letter-spacing: 2px;
+  }
+
+  .speech-bubble {
+    padding: 18px 20px;
+  }
+
+  .avatar-sprite {
+    width: 140px;
+    height: 180px;
+  }
+}
+
+/* ========================================
+   REDUCED MOTION ACCESSIBILITY
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .gradient-text,
+  .intro-screen::before,
+  .intro-status::after,
+  .runner-track {
+    animation: none;
+  }
+
+  .scroll-avatar {
+    transition: none;
+  }
+}
+/* Pull-cord theme switch */
+.theme-rope {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 42px;
+  height: 105px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  overflow: visible;
+  z-index: 50;
+}
+
+.rope-line {
+  width: 2px;
+  height: 65px;
+  background: linear-gradient(
+    to bottom,
+    #a3a3a3,
+    #d1d5db,
+    #737373
+  );
+  border-radius: 10px;
+  transform-origin: top;
+  transition: height 0.25s ease;
+}
+
+.rope-handle {
+  width: 18px;
+  height: 27px;
+  margin-top: -2px;
+  border-radius: 8px 8px 11px 11px;
+  background: linear-gradient(135deg, #10b981, #047857);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s ease;
+}
+
+.rope-grip {
+  width: 5px;
+  height: 12px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.theme-rope:hover .rope-handle {
+  transform: translateY(4px);
+}
+
+.theme-rope:active .rope-handle {
+  transform: translateY(12px);
+}
+
+.theme-rope:active .rope-line {
+  height: 73px;
+}
+
+.theme-rope.is-light .rope-handle {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-rope,
+  .rope-line,
+  .rope-handle {
+    transition: none;
+  }
+}
+
+/* ========================================
+   HANGING PULL-CORD THEME SWITCH
+======================================== */
+
+.theme-rope {
+  position: absolute;
+  top: calc(100% - 10px);
+  right: 28px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 42px;
+  height: 105px;
+  padding: 0;
+
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  overflow: visible;
+  z-index: 60;
+}
+
+.rope-line {
+  width: 2px;
+  height: 68px;
+  border-radius: 10px;
+
+  background: linear-gradient(
+    to right,
+    #737373,
+    #e5e7eb,
+    #737373
+  );
+
+  transform-origin: top;
+  transition: height 0.2s ease;
+}
+
+.rope-handle {
+  width: 19px;
+  height: 27px;
+  margin-top: -2px;
+
+  border-radius: 7px 7px 11px 11px;
+  background: linear-gradient(135deg, #10b981, #047857);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.rope-grip {
+  width: 5px;
+  height: 12px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.theme-rope:hover .rope-handle {
+  transform: translateY(4px);
+}
+
+.theme-rope:active .rope-handle {
+  transform: translateY(13px);
+}
+
+.theme-rope:active .rope-line {
+  height: 76px;
+}
+
+.theme-rope.is-light .rope-handle {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+}
+
+@media (max-width: 480px) {
+  .theme-rope {
+    right: 78px;
+    height: 85px;
+  }
+
+  .rope-line {
+    height: 52px;
+  }
+
+  .theme-rope:active .rope-line {
+    height: 60px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-rope,
+  .rope-line,
+  .rope-handle {
+    transition: none;
+  }
+}
