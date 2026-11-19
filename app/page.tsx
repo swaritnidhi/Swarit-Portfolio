@@ -10,27 +10,18 @@ import {
   type FormEvent,
 } from "react";
 
+import { supabase } from "@/lib/supabase";
+import BootScreen from "@/components/BootScreen";
+
+
 const navigation = [
   { number: "01", label: "About", id: "about" },
   { number: "02", label: "Work", id: "work" },
   { number: "03", label: "Achievements", id: "achievements" },
-  { number: "04", label: "Skills", id: "skills" },
-  { number: "05", label: "Contact", id: "contact" },
+  { number: "04", label: "Contact", id: "contact" },
 ];
 
-const skills = [
-  { name: "C Programming", category: "Programming", level: "Learning", detail: "Exploring programming fundamentals and problem-solving with C." },
-  { name: "Python", category: "Programming", level: "Learning", detail: "Learning Python from the basics and applying it to small experiments." },
-  { name: "HTML & CSS", category: "Web", level: "Practising", detail: "Building page structures, layouts, and responsive interfaces." },
-  { name: "JavaScript", category: "Web", level: "Learning", detail: "Exploring the language behind interactive web experiences." },
-  { name: "React", category: "Web", level: "Exploring", detail: "Learning component-based interfaces and modern frontend development." },
-  { name: "Database Management", category: "Technology", level: "Exploring", detail: "Learning how applications organise and work with data." },
-  { name: "Linux & Command Line", category: "Technology", level: "Practising", detail: "Using Linux and terminal tools in my development environment." },
-  { name: "AI & Machine Learning", category: "Emerging Tech", level: "Exploring", detail: "Discovering how intelligent systems are designed and trained." },
-  { name: "Cloud Computing", category: "Emerging Tech", level: "Exploring", detail: "Learning about cloud platforms and distributed services." },
-  { name: "Robotics", category: "Emerging Tech", level: "Exploring", detail: "Interested in the connection between software and physical systems." },
-  { name: "Cybersecurity", category: "Technology", level: "Exploring", detail: "Learning about digital safety, security principles, and vulnerabilities." },
-];
+
 
 const developerStatuses = [
   "Probably debugging something.",
@@ -63,6 +54,8 @@ const reactions = [
   { emoji: "🧠", label: "Interesting" },
 ];
 
+
+
 type TerminalLine = {
   text: string;
   type: "command" | "output" | "error" | "success";
@@ -88,22 +81,20 @@ export default function Home() {
   ]);
   const [skillFilter, setSkillFilter] = useState("All");
   const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
-  const [reactionCounts, setReactionCounts] = useState([0, 0, 0, 0]);
-  const [myReaction, setMyReaction] = useState<number | null>(null);
+ const [reactionCounts, setReactionCounts] = useState([0, 0, 0, 0]);
+ const [voterId, setVoterId] = useState<string | null>(null);
+const [selectedReaction, setSelectedReaction] = useState<string | null>(null);
+
 
   // Contact form state
   const [sending, setSending] = useState(false);
   const [formStatus, setFormStatus] = useState<"success" | "error" | "">("");
 
   const terminalEndRef = useRef<HTMLDivElement>(null);
+  const previousTerminalLines = useRef(terminalLines);
   const commandInputRef = useRef<HTMLInputElement>(null);
 
-  // Intro screen
-  useEffect(() => {
-    const timer = window.setTimeout(() => setShowIntro(false), 3500);
-    return () => window.clearTimeout(timer);
-  }, []);
-
+  
   // Rotating developer status
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -120,7 +111,6 @@ export default function Home() {
       "about",
       "work",
       "achievements",
-      "skills",
       "contact",
     ];
 
@@ -171,16 +161,10 @@ export default function Home() {
   }, []);
 
   // Focus command search when it opens
-  useEffect(() => {
-    if (commandOpen) {
-      window.setTimeout(() => commandInputRef.current?.focus(), 50);
-    }
-  }, [commandOpen]);
+ 
 
   // Keep terminal scrolled to the latest line
-  useEffect(() => {
-    terminalEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [terminalLines]);
+ // Keep terminal scrolled to the latest line, but not on initial load
 
   const themeText = lightMode
     ? "text-[#263F34]"
@@ -224,7 +208,6 @@ export default function Home() {
       { label: "About me", detail: "A little introduction", id: "about", icon: "◎" },
       { label: "Explore projects", detail: "Academic and personal work", id: "work", icon: "⌘" },
       { label: "Achievements", detail: "Milestones and recognition", id: "achievements", icon: "✳" },
-      { label: "Explore skills", detail: "What I'm learning", id: "skills", icon: "◇" },
       { label: "Contact", detail: "Start a conversation", id: "contact", icon: "↗" },
     ],
     []
@@ -253,7 +236,6 @@ export default function Home() {
           { text: "help       — Show available commands", type: "output" },
           { text: "about      — Learn about Swarit", type: "output" },
           { text: "projects   — List current projects", type: "output" },
-          { text: "skills     — List areas I'm exploring", type: "output" },
           { text: "contact    — Jump to contact section", type: "output" },
           { text: "clear      — Clear terminal", type: "output" },
           { text: "whoami     — Display user information", type: "output" },
@@ -271,20 +253,12 @@ export default function Home() {
       case "projects":
         addLines([
           { text: "01  Smart City Model — Academic exhibition project", type: "success" },
-          { text: "02  Newton's Law of Cooling — Physics project", type: "output" },
           { text: "03  Personal Portfolio — In development", type: "output" },
           { text: "04  ECHO-7 — Desktop experiment in development", type: "output" },
         ]);
         break;
 
-      case "skills":
-        addLines([
-          { text: "C, Python, HTML, CSS, JavaScript, React", type: "success" },
-          { text: "Linux, databases, AI, cloud, robotics, cybersecurity", type: "output" },
-          { text: "Some are familiar; others are still being explored.", type: "output" },
-        ]);
-        break;
-
+    
       case "contact":
         addLines([
           { text: "Opening the contact section...", type: "success" },
@@ -321,29 +295,92 @@ export default function Home() {
     setTerminalInput("");
   };
 
-  const filteredSkills = skills.filter((skill) =>
-    skillFilter === "All" ? true : skill.category === skillFilter
-  );
+  
+
+  // Load reaction counts
+  const loadReactionCounts = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("portfolio_reactions")
+      .select("emoji, count");
+
+    if (error) {
+      console.error("Could not load reaction counts:", error.message);
+      return;
+    }
+
+    if (!data) return;
+
+    setReactionCounts(
+      reactions.map((reaction) => {
+        const saved = data.find(
+          (item) => item.emoji === reaction.emoji
+        );
+
+        return Number(saved?.count ?? 0);
+      })
+    );
+  }, []);
+
+  // Load or create the browser's voter ID
+  useEffect(() => {
+    let id = localStorage.getItem("portfolio-voter-id");
+
+    if (!id) {
+      id = crypto.randomUUID();
+      localStorage.setItem("portfolio-voter-id", id);
+    }
+
+    setVoterId(id);
+
+    const savedEmoji = localStorage.getItem(
+      "portfolio-selected-reaction"
+    );
+
+    if (savedEmoji && reactions.some((r) => r.emoji === savedEmoji)) {
+      setSelectedReaction(savedEmoji);
+    }
+  }, []);
+
+  // Load counts when the page opens
+  useEffect(() => {
+    void loadReactionCounts();
+  }, [loadReactionCounts]);
 
   // Visitor reactions
-  const handleReaction = (index: number) => {
-    setReactionCounts((previous) => {
-      const next = [...previous];
+ 
 
-      if (myReaction === index) {
-        next[index] = Math.max(0, next[index] - 1);
-      } else {
-        if (myReaction !== null) {
-          next[myReaction] = Math.max(0, next[myReaction] - 1);
-        }
-        next[index] += 1;
-      }
 
-      return next;
-    });
+useEffect(() => {
+  void loadReactionCounts();
+}, [loadReactionCounts]);
 
-    setMyReaction((previous) => (previous === index ? null : index));
-  };
+
+  // Visitor reactions
+
+const handleReaction = async (index: number) => {
+  const chosenReaction = reactions[index];
+
+  if (!chosenReaction || !voterId) return;
+
+  const { error } = await supabase.rpc("set_reaction", {
+    p_voter_id: voterId,
+    p_emoji: chosenReaction.emoji,
+  });
+
+  if (error) {
+    console.error("Could not save reaction:", error.message);
+    return;
+  }
+
+  setSelectedReaction(chosenReaction.emoji);
+
+  localStorage.setItem(
+    "portfolio-selected-reaction",
+    chosenReaction.emoji
+  );
+
+  await loadReactionCounts();
+};
 
   // AJAX contact form submission
  const handleContactSubmit = async (
@@ -383,54 +420,20 @@ export default function Home() {
   }
 };
 
-  return (
+ return (
+  <>
+    {showIntro && (
+      <BootScreen onComplete={() => setShowIntro(false)} />
+    )}
+
     <main
-      className={`relative min-h-screen overflow-hidden transition-colors duration-500 ${
-        lightMode
-          ? "light-theme bg-[#E5EBDD] text-[#263F34]"
-          : "dark-theme bg-[#14251F] text-[#EAF1E5]"
-      }`}
-    >
-      {/* ORIGINAL RUNNING AVATAR SCROLL PROGRESS */}
-      <div
-        className="scroll-avatar-track"
-        role="progressbar"
-        aria-label="Page scroll progress"
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={Math.round(scrollProgress)}
-      >
-        <div className="scroll-avatar-rail" />
-        <div
-          className="scroll-avatar-fill"
-          style={{ width: `${scrollProgress}%` }}
-        />
-        <img
-          src="/avatar-run.gif"
-          alt=""
-          aria-hidden="true"
-          className="scroll-avatar"
-          style={{ left: `${scrollProgress}%` }}
-        />
-      </div>
-
-      {/* ORIGINAL AVATAR INTRO SCREEN */}
-      {showIntro && (
-        <div className="intro-screen">
-          <div className="speech-bubble">
-            <p>Checking if my code works.</p>
-            <strong>Wish me luck. 💀</strong>
-          </div>
-
-          <div className="runner-track">
-            <div className="avatar-sprite" />
-          </div>
-
-          <div className="intro-status">
-            INITIALIZING PERSONAL EXPERIENCE
-          </div>
-        </div>
-      )}
+  className={`relative min-h-screen overflow-hidden transition-colors duration-500 ${
+    lightMode
+      ? "light-theme bg-[#F5F0E6] text-[#30332E]"
+      : "dark-theme bg-[#14251F] text-[#EAF1E5]"
+  }`}
+>
+     
 
       {/* BACKGROUND ATMOSPHERE */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
@@ -470,7 +473,7 @@ export default function Home() {
             : "border-white/10 bg-[#14251F]/90 shadow-lg shadow-black/10"
         }`}
       >
-        <div className="flex items-center justify-between px-5 py-3">
+       <div className="relative flex items-center justify-between px-3 py-3 sm:px-5">
           <a href="#home" onClick={closeMenu} className="group flex items-center gap-3">
             <span
               className={`flex h-10 w-10 items-center justify-center rounded-xl text-sm font-bold transition-transform duration-300 group-hover:rotate-6 ${
@@ -517,7 +520,7 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="ml-auto flex shrink-0 items-center gap-2">
             <button
               onClick={() => setCommandOpen(true)}
               title="Open command center"
@@ -647,119 +650,200 @@ export default function Home() {
       )}
 
       {/* HERO */}
+    
+      {/* HERO */}
       <section
         id="home"
-        className="relative z-10 mx-auto grid min-h-screen max-w-7xl items-center gap-12 px-6 pb-24 pt-32 lg:grid-cols-[1.1fr_0.9fr] lg:px-12"
-      >
-        <div className="relative max-w-2xl">
-          <div className={`mb-8 inline-flex items-center gap-3 rounded-full border px-4 py-2 ${
-            lightMode ? "border-[#C7D4C3] bg-[#F0F4EC]" : "border-white/10 bg-white/[0.04]"
-          }`}>
+       
+className="relative z-10 mx-auto grid min-h-[calc(100svh-110px)] max-w-[1400px] items-center gap-12 px-6 pb-12 pt-24 lg:grid-cols-[1.08fr_0.92fr] lg:gap-16 lg:px-14 lg:pb-12 lg:pt-20">
+        {/* LEFT — INTRODUCTION */}
+        <div className="relative z-10 flex flex-col justify-center">
+          <div
+            className={`mb-7 inline-flex w-fit items-center gap-3 rounded-full border px-4 py-2 ${
+              lightMode
+                ? "border-[#C7D4C3] bg-[#F0F4EC]"
+                : "border-white/10 bg-white/[0.04]"
+            }`}
+          >
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#75A98B] opacity-60" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-[#75A98B]" />
+              <span className="relative h-2 w-2 rounded-full bg-[#75A98B]" />
             </span>
-            <span className={`text-[10px] font-medium tracking-[0.2em] ${sectionLabel}`}>
+
+            <span className={`text-[10px] font-medium tracking-[0.18em] ${sectionLabel}`}>
               COMPUTER SCIENCE STUDENT · NEPAL
             </span>
           </div>
 
-          <p className={`mb-4 text-sm tracking-[0.25em] ${mutedText}`}>HELLO, WORLD. I'M</p>
+          <p className={`mb-4 text-xs tracking-[0.25em] ${mutedText}`}>
+            HELLO, WORLD. I'M
+          </p>
 
-          <h1 className="hero-heading text-6xl font-semibold leading-[1.05] tracking-[-0.065em] sm:text-7xl lg:text-[6.5rem]">
-            Swarit
-            <span className="gradient-text block">.. Nidhi.</span>
-          </h1>
 
-          <h2 className={`mt-7 max-w-lg text-xl font-medium leading-relaxed sm:text-2xl ${themeText}`}>
+<h1 className="hero-heading text-6xl font-medium leading-[0.95] tracking-[-0.07em] sm:text-7xl lg:text-[5.5rem] xl:text-[6.2rem]">
+  <span className="gradient-text">Swarit Nidhi.</span>
+</h1>
+
+
+
+          <h2 className={`mt-7 max-w-xl text-xl font-medium leading-relaxed sm:text-2xl ${themeText}`}>
             Curious about technology.
             <span className={accentText}> Driven to create.</span>
           </h2>
 
-          <p className={`mt-5 max-w-lg text-sm leading-8 sm:text-base ${mutedText}`}>
+          <p className={`mt-4 max-w-xl text-sm leading-7 sm:text-base sm:leading-8 ${mutedText}`}>
             I'm a Class XII Science student from Nepal exploring
             technology, creativity, and problem-solving. I enjoy
             experimenting with ideas, learning how things work,
             and turning curiosity into meaningful projects.
           </p>
 
-          <div className={`mt-6 inline-flex min-h-10 items-center gap-3 rounded-xl border px-4 py-2 ${
-            lightMode ? "border-[#C7D4C3] bg-[#F0F4EC]" : "border-white/10 bg-white/[0.03]"
-          }`}>
+          {/* STATUS */}
+          <div
+            className={`mt-6 inline-flex min-h-10 w-fit items-center gap-3 rounded-xl border px-4 py-2 ${
+              lightMode
+                ? "border-[#C7D4C3] bg-[#F0F4EC]"
+                : "border-white/10 bg-white/[0.03]"
+            }`}
+          >
             <span className="text-xs text-emerald-500">●</span>
-            <span className={`text-xs ${mutedText}`}>{developerStatuses[statusIndex]}</span>
+            <span className={`text-xs ${mutedText}`}>
+              {developerStatuses[statusIndex]}
+            </span>
           </div>
 
-          <div className="mt-9 flex flex-wrap items-center gap-4">
-            <a href="#work" className="group inline-flex items-center gap-4 rounded-full bg-[#A9D2B2] px-7 py-4 text-sm font-semibold text-[#183D32] shadow-lg shadow-[#75A98B]/10 transition-all duration-300 hover:-translate-y-1 hover:bg-[#C5DFC7] hover:shadow-xl hover:shadow-[#75A98B]/20">
+          {/* ACTIONS */}
+          <div className="mt-7 flex flex-wrap items-center gap-3">
+            <a
+              href="#work"
+              className="group inline-flex items-center gap-3 rounded-full bg-[#A9D2B2] px-6 py-3.5 text-sm font-semibold text-[#183D32] transition-all duration-300 hover:-translate-y-1 hover:bg-[#C5DFC7]"
+            >
               Explore my work
-              <span className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1">↗</span>
+              <span className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1">
+                ↗
+              </span>
             </a>
-            <a href="#about" className={`group inline-flex items-center gap-2 px-4 py-3 text-sm transition-all duration-300 hover:gap-4 ${accentText}`}>
-              Get to know me <span>→</span>
+
+            <a
+              href="#about"
+              className={`inline-flex items-center gap-2 rounded-full px-5 py-3.5 text-sm transition-all duration-300 hover:gap-3 ${accentText}`}
+            >
+              Get to know me →
             </a>
           </div>
 
-          <div className={`mt-16 flex flex-wrap gap-x-10 gap-y-4 border-t pt-6 ${
-            lightMode ? "border-[#C7D4C3]" : "border-white/10"
-          }`}>
+          {/* QUICK DETAILS */}
+          <div
+            className={`mt-10 flex flex-wrap gap-x-10 gap-y-4 border-t pt-5 ${
+              lightMode ? "border-[#C7D4C3]" : "border-white/10"
+            }`}
+          >
             <div>
-              <p className={`text-[10px] tracking-[0.2em] ${mutedText}`}>CURRENT FOCUS</p>
-              <p className={`mt-2 text-sm font-medium ${themeText}`}>Learning · Building · Exploring</p>
+              <p className={`text-[10px] tracking-[0.2em] ${mutedText}`}>
+                CURRENT FOCUS
+              </p>
+              <p className={`mt-2 text-sm font-medium ${themeText}`}>
+                Learning · Building · Exploring
+              </p>
             </div>
+
             <div>
-              <p className={`text-[10px] tracking-[0.2em] ${mutedText}`}>BASED IN</p>
-              <p className={`mt-2 text-sm font-medium ${themeText}`}>Nepal 🇳🇵</p>
+              <p className={`text-[10px] tracking-[0.2em] ${mutedText}`}>
+                BASED IN
+              </p>
+              <p className={`mt-2 text-sm font-medium ${themeText}`}>
+                Nepal 🇳🇵
+              </p>
             </div>
           </div>
         </div>
 
-        {/* PORTRAIT */}
-        <div className="relative mx-auto w-full max-w-[460px]">
+        {/* RIGHT — PORTRAIT */}
+        
+<div className="relative z-10 h-[400px] w-full object-contain object-bottom transition-transform duration-700 hover:scale-[1.02] sm:h-[460px] lg:h-[500px]">
+
           <div className="absolute inset-10 rounded-full bg-[#75A98B]/20 blur-[90px]" />
-          <div className={`absolute inset-x-5 bottom-5 top-5 rotate-3 rounded-[2.5rem] border ${
-            lightMode ? "border-[#A9C5A0]" : "border-[#A9D2B2]/20"
-          }`} />
 
-          <div className={`relative overflow-hidden rounded-[2.5rem] border ${
-            lightMode ? "border-[#C7D4C3] bg-[#DCE6D7]" : "border-white/10 bg-[#1B3028]"
-          }`}>
-            <div className="absolute inset-0 opacity-30" style={{
-              backgroundImage: "linear-gradient(rgba(169,210,178,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(169,210,178,0.12) 1px, transparent 1px)",
-              backgroundSize: "35px 35px",
-            }} />
-            <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full border border-[#75A98B]/20" />
-            <div className="absolute -right-8 -top-8 h-48 w-48 rounded-full border border-[#75A98B]/20" />
+          <div
+            className={`absolute inset-x-4 bottom-4 top-4 rotate-2 rounded-[2rem] border ${
+              lightMode
+                ? "border-[#A9C5A0]"
+                : "border-[#A9D2B2]/20"
+            }`}
+          />
 
-            <div className="relative flex min-h-[440px] items-end justify-center sm:min-h-[540px]">
-              <img
-                src="/portrait.png"
-                alt="Portrait of Swarit Nidhi"
-                className="relative z-10 h-[420px] w-full object-contain object-bottom transition-transform duration-700 hover:scale-[1.04] sm:h-[520px]"
-              />
-            </div>
+          <div
+            className={`relative overflow-hidden rounded-[2rem] border ${
+              lightMode
+                ? "border-[#C7D4C3] bg-[#DCE6D7]"
+                : "border-white/10 bg-[#1B3028]"
+            }`}
+          >
+            {/* GRID */}
+            <div
+              className="pointer-events-none absolute inset-0 opacity-30"
+              style={{
+                backgroundImage:
+                  "linear-gradient(rgba(169,210,178,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(169,210,178,0.12) 1px, transparent 1px)",
+                backgroundSize: "35px 35px",
+              }}
+            />
 
-            <div className={`absolute bottom-5 left-5 z-20 rounded-xl border px-4 py-3 backdrop-blur-xl ${
-              lightMode ? "border-[#C7D4C3] bg-[#E5EBDD]/90" : "border-white/10 bg-[#14251F]/80"
-            }`}>
-              <p className={`text-[9px] tracking-[0.2em] ${mutedText}`}>CURRENTLY EXPLORING</p>
-              <p className={`mt-1 text-xs font-semibold ${themeText}`}>The world of technology ↗</p>
+            {/* CIRCLES */}
+            <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full border border-[#75A98B]/20" />
+            <div className="pointer-events-none absolute -right-8 -top-8 h-48 w-48 rounded-full border border-[#75A98B]/20" />
+
+            {/* IMAGE */}
+            
+<div className="relative flex min-h-[400px] items-end justify-center sm:min-h-[460px] lg:min-h-[500px]"> <img
+    src="/portrait.png"
+    alt="Portrait of Swarit Nidhi"
+    className="relative z-10 h-[440px] w-full object-contain object-bottom transition-transform duration-700 hover:scale-[1.02] sm:h-[520px] lg:h-[580px]"
+  />
+</div>
+
+
+            {/* IMAGE LABEL */}
+            <div
+              className={`absolute bottom-5 left-5 z-20 rounded-xl border px-4 py-3 backdrop-blur-xl ${
+                lightMode
+                  ? "border-[#C7D4C3] bg-[#E5EBDD]/90"
+                  : "border-white/10 bg-[#14251F]/80"
+              }`}
+            >
+              <p className={`text-[9px] tracking-[0.2em] ${mutedText}`}>
+                CURRENTLY EXPLORING
+              </p>
+              <p className={`mt-1 text-xs font-semibold ${themeText}`}>
+                The world of technology ↗
+              </p>
             </div>
           </div>
 
-          <div className={`absolute -right-2 top-12 z-20 rounded-2xl border px-4 py-3 shadow-xl backdrop-blur-xl sm:-right-8 ${
-            lightMode ? "border-[#C7D4C3] bg-[#F0F4EC]" : "border-white/10 bg-[#1B3028]/90"
-          }`}>
-            <span className={`text-xs font-semibold ${accentText}`}>
-              Think.<br />Create.<br />Repeat.
+          {/* FLOATING NOTE */}
+          <div
+            className={`absolute -right-2 top-12 z-20 rounded-2xl border px-4 py-3 shadow-xl backdrop-blur-xl sm:-right-5 ${
+              lightMode
+                ? "border-[#C7D4C3] bg-[#F0F4EC]"
+                : "border-white/10 bg-[#1B3028]/90"
+            }`}
+          >
+            <span className={`text-xs font-semibold leading-6 ${accentText}`}>
+              Think.
+              <br />
+              Create.
+              <br />
+              Repeat.
             </span>
           </div>
 
-          <div className="absolute -bottom-5 right-5 z-20 rotate-[-4deg] rounded-full border border-emerald-500/20 bg-[#A9D2B2] px-4 py-2 text-xs font-bold text-[#183D32] shadow-lg">
+          {/* SMALL BADGE */}
+          <div className="absolute -bottom-4 right-5 z-20 rotate-[-4deg] rounded-full border border-emerald-500/20 bg-[#A9D2B2] px-4 py-2 text-xs font-bold text-[#183D32] shadow-lg">
             100% curious ✳
           </div>
         </div>
       </section>
+
 
       {/* ABOUT */}
       <section id="about" className="relative py-28 md:py-36">
@@ -808,12 +892,11 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-6">
           <p className={`mb-6 text-xs font-semibold uppercase tracking-[0.25em] ${mutedText}`}>02 / SELECTED WORK</p>
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
-            <h2 className={`max-w-3xl text-4xl font-semibold leading-tight tracking-tight md:text-6xl ${themeText}`}>
-              Ideas become<span className="gradient-text"> experiments.</span>
-            </h2>
-            <p className={`max-w-sm text-sm leading-7 ${mutedText}`}>
-              A collection of academic work, personal projects, and concepts I'm exploring along the way.
-            </p>
+  <h2 className="selected-work-title">
+  Ideas become{" "}
+  <span className="heading-highlight">experiments.</span>
+</h2>
+           
           </div>
 
           <div className="mt-16 grid gap-6 md:grid-cols-2">
@@ -827,15 +910,7 @@ export default function Home() {
               <div className="mt-8 flex flex-wrap gap-2">{projectTags.smartCity.map((tag) => <span key={tag} className={`rounded-full border px-3 py-1 text-xs ${borderColor}`}>{tag}</span>)}</div>
             </article>
 
-            <article className={`group rounded-3xl border p-8 transition-all duration-300 hover:-translate-y-1 ${cardStyle}`}>
-              <div className="flex items-center justify-between gap-3">
-                <span className={`text-xs uppercase tracking-widest ${sectionLabel}`}>Academic Project</span>
-                <span className={`rounded-full px-3 py-1 text-xs ${lightMode ? "bg-black/5" : "bg-white/5"}`}>Completed</span>
-              </div>
-              <h3 className={`mt-8 text-2xl font-semibold ${themeText}`}>Newton's Law of Cooling</h3>
-              <p className={`mt-4 leading-7 ${mutedText}`}>An academic physics project exploring how the temperature of an object changes as it cools toward the temperature of its surroundings.</p>
-              <div className="mt-8 flex flex-wrap gap-2">{projectTags.cooling.map((tag) => <span key={tag} className={`rounded-full border px-3 py-1 text-xs ${borderColor}`}>{tag}</span>)}</div>
-            </article>
+          
 
             <article className={`group rounded-3xl border p-8 transition-all duration-300 hover:-translate-y-1 ${cardStyle}`}>
               <div className="flex items-center justify-between gap-3">
@@ -953,65 +1028,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* INTERACTIVE SKILLS */}
-      <section id="skills" className="relative z-10 mx-auto max-w-7xl scroll-mt-28 px-6 py-20 lg:px-12">
-        <p className={`text-xs tracking-[0.3em] ${sectionLabel}`}>04 / EXPLORATION</p>
-        <h2 className={`mt-5 text-4xl font-semibold sm:text-5xl ${themeText}`}>
-          Always <span className="gradient-text">learning.</span>
-        </h2>
-        <p className={`mt-5 max-w-xl leading-7 ${mutedText}`}>
-          Skills grow through curiosity, practice, and the willingness to experiment with unfamiliar things. Select a topic to see what I'm exploring.
-        </p>
-
-        <div className="mt-9 flex flex-wrap gap-2">
-          {["All", "Programming", "Web", "Technology", "Emerging Tech"].map((category) => (
-            <button
-              key={category}
-              onClick={() => { setSkillFilter(category); setSelectedSkill(null); }}
-              className={`rounded-full border px-4 py-2 text-xs transition-all ${
-                skillFilter === category
-                  ? "border-[#A9D2B2] bg-[#A9D2B2] text-[#183D32]"
-                  : lightMode
-                    ? "border-[#C7D4C3] text-[#65776A] hover:border-[#75A98B]"
-                    : "border-white/10 text-[#A5B5A8] hover:border-[#75A98B]/50"
-              }`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredSkills.map((skill) => (
-            <button
-              key={skill.name}
-              onClick={() => setSelectedSkill((current) => current === skill.name ? null : skill.name)}
-              className={`group rounded-2xl border p-5 text-left transition-all duration-300 hover:-translate-y-1 ${
-                selectedSkill === skill.name
-                  ? "border-emerald-500/60 bg-emerald-500/[0.08]"
-                  : cardStyle
-              }`}
-            >
-              <div className="flex items-center justify-between gap-3">
-                <span className={`font-semibold ${themeText}`}>{skill.name}</span>
-                <span className="text-emerald-500 transition-transform group-hover:translate-x-1">↗</span>
-              </div>
-              <div className="mt-3 flex items-center justify-between">
-                <span className={`text-xs ${mutedText}`}>{skill.category}</span>
-                <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-[10px] text-emerald-600 dark:text-emerald-400">{skill.level}</span>
-              </div>
-              {selectedSkill === skill.name && (
-                <p className={`mt-4 border-t border-current/10 pt-4 text-sm leading-6 ${mutedText}`}>
-                  {skill.detail}
-                </p>
-              )}
-            </button>
-          ))}
-        </div>
-
-        <p className={`mt-7 text-xs ${mutedText}`}>⚡ Skill level: permanently updating...</p>
-      </section>
-
+     
       {/* INTERACTIVE TERMINAL */}
       <section id="terminal" className="relative z-10 mx-auto max-w-7xl px-6 py-20 lg:px-12">
         <div className="mb-8">
@@ -1068,7 +1085,7 @@ export default function Home() {
             </button>
           </form>
           <div className="flex flex-wrap gap-2 border-t border-white/10 px-5 py-3">
-            {["help", "about", "projects", "skills", "whoami"].map((command) => (
+            {["help", "about", "projects", "whoami"].map((command) => (
               <button
                 key={command}
                 onClick={() => runTerminalCommand(command)}
@@ -1081,41 +1098,62 @@ export default function Home() {
         </div>
       </section>
 
+
       {/* VISITOR REACTIONS */}
       <section className="relative z-10 mx-auto max-w-7xl px-6 py-16 lg:px-12">
-        <div className={`rounded-3xl border p-7 md:p-10 ${
-          lightMode ? "border-[#C7D4C3] bg-[#F0F4EC]" : "border-white/10 bg-white/[0.03]"
-        }`}>
+        <div
+          className={`rounded-3xl border p-7 md:p-10 ${
+            lightMode
+              ? "border-[#C7D4C3] bg-[#F0F4EC]"
+              : "border-white/10 bg-white/[0.03]"
+          }`}
+        >
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
             <div>
-              <p className={`text-xs tracking-[0.25em] ${sectionLabel}`}>YOUR TURN</p>
-              <h2 className={`mt-3 text-2xl font-semibold ${themeText}`}>What's your reaction?</h2>
-              <p className={`mt-2 text-sm ${mutedText}`}>Leave a little reaction before you go.</p>
+              <p className={`text-xs tracking-[0.25em] ${sectionLabel}`}>
+                YOUR TURN
+              </p>
+              <h2 className={`mt-3 text-2xl font-semibold ${themeText}`}>
+                What's your reaction?
+              </h2>
+              <p className={`mt-2 text-sm ${mutedText}`}>
+                Leave a little reaction before you go.
+              </p>
             </div>
 
             <div className="flex flex-wrap gap-3">
               {reactions.map((reaction, index) => (
-                <button
-                  key={reaction.label}
-                  onClick={() => handleReaction(index)}
-                  aria-pressed={myReaction === index}
-                  className={`flex min-w-[75px] flex-col items-center gap-2 rounded-2xl border px-4 py-3 transition-all duration-300 hover:-translate-y-1 ${
-                    myReaction === index
-                      ? "border-emerald-500/60 bg-emerald-500/10"
-                      : lightMode
-                        ? "border-[#C7D4C3] hover:border-[#75A98B]"
-                        : "border-white/10 hover:border-emerald-500/40"
-                  }`}
-                >
-                  <span className="text-2xl transition-transform hover:scale-125">{reaction.emoji}</span>
-                  <span className={`text-[10px] ${mutedText}`}>{reaction.label}</span>
-                  <span className={`text-xs font-semibold ${accentText}`}>{reactionCounts[index]}</span>
-                </button>
+                
+<button
+  key={reaction.emoji}
+  type="button"
+  disabled={!voterId}
+  aria-pressed={selectedReaction === reaction.emoji}
+  onClick={() => handleReaction(index)}
+  className={`flex items-center gap-2 rounded-full border px-4 py-3 text-sm transition-all duration-300 hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-50 ${
+    selectedReaction === reaction.emoji
+      ? "border-[#A9D2B2] bg-[#A9D2B2]/20 ring-1 ring-[#A9D2B2]"
+      : lightMode
+        ? "border-[#C7D4C3] bg-white text-[#14251F] hover:border-[#A9D2B2]"
+        : "border-white/10 bg-white/[0.04] text-white hover:border-[#A9D2B2]/50"
+  }`}
+>
+  <span>{reaction.emoji}</span>
+  <span>{reaction.label}</span>
+  <span className="font-semibold tabular-nums">
+    {reactionCounts[index] ?? 0}
+  </span>
+  {selectedReaction === reaction.emoji && (
+    <span className="text-xs text-emerald-500">✓</span>
+  )}
+</button>
+
               ))}
             </div>
           </div>
+
           <p className={`mt-5 text-[10px] ${mutedText}`}>
-            {myReaction === null ? "Choose one reaction. You can change it anytime." : "Thanks for leaving a reaction! 💚"}
+            Every reaction counts. Thanks for supporting my work! 💚
           </p>
         </div>
       </section>
@@ -1267,6 +1305,7 @@ export default function Home() {
           ↑
         </button>
       )}
-    </main>
+     </main>
+  </>
   );
 }

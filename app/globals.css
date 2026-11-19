@@ -1,610 +1,2173 @@
 
+
 @import "tailwindcss";
 
+/* SWARIT.OS foundation */
+:root { color-scheme: dark; --jade: #75a98b; --jade-bright: #8be0ad; --jade-deep: #176b45;
+  --surface-glass: rgba(255,255,255,.055); --surface-border: rgba(169,210,178,.16);
+  --motion-fast: 180ms; --motion-smooth: 320ms; }
+.dark-theme { color-scheme: dark; }
+.light-theme { color-scheme: light; }
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+body { min-width: 320px; margin: 0; font-family: var(--font-body), Arial, sans-serif; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+img, video, canvas, svg { max-width: 100%; }
+button, input, textarea, select { font: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 2px solid var(--jade-bright, #8be0ad); outline-offset: 3px; }
+::selection { background: #75A98B; color: #10251B; }
+
+
+
+
 /* ========================================
+
    BASE STYLES
-======================================== */
+
+\======================================== */
+
+
 
 html {
+
   scroll-behavior: smooth;
+
 }
+
+
 
 body {
+
   margin: 0;
+
   font-family: Arial, Helvetica, sans-serif;
+
 }
+
+
 
 ::selection {
+
   background: #75A98B;
+
   color: #10251B;
+
 }
 
+
+
 /* ========================================
+
    GRADIENT TYPOGRAPHY
-======================================== */
+
+\======================================== */
+
+
 
 .dark-theme .gradient-text {
+
   background-image: linear-gradient(
+
     110deg,
+
     #62D995,
+
     #E0FFEB,
+
     #72C99C,
+
     #B4F5C8,
+
     #62D995
+
   );
+
 }
+
+
 
 .light-theme .gradient-text {
+
   background-image: linear-gradient(
+
     110deg,
+
     #176B45,
+
     #319B68,
+
     #123F2D,
+
     #55A879,
+
     #176B45
+
   );
+
 }
+
+
 
 .gradient-text {
+
   display: inline-block;
+
   padding-block: 0.08em 0.12em;
+
   line-height: 1.25;
+
   background-size: 200% auto;
+
   background-clip: text;
+
   -webkit-background-clip: text;
+
   -webkit-text-fill-color: transparent;
+
   color: transparent;
+
   animation: jade-shimmer 6s linear infinite;
+
   filter: drop-shadow(0 0 10px rgba(80, 190, 125, 0.16));
+
 }
+
+
 
 .hero-heading {
+
   line-height: 1.2;
+
   padding-block: 0.06em;
+
 }
+
+
 
 @keyframes jade-shimmer {
+
   to {
+
     background-position: 200% center;
+
   }
+
 }
 
+
+
 /* ========================================
+
    BOTTOM SCROLL PROGRESS + MOVING AVATAR
-======================================== */
+
+\======================================== */
+
+
 
 .scroll-avatar-track {
+
   position: fixed;
+
   z-index: 110;
+
   bottom: 0;
+
   left: 45px;
+
   right: 45px;
+
   height: 95px;
+
   pointer-events: none;
+
 }
+
 .scroll-avatar-rail,
+
 .scroll-avatar-fill {
+
   position: absolute;
+
   bottom: 17px;
+
   left: 0;
+
   height: 4px;
+
   border-radius: 999px;
+
 }
+
+
 
 .scroll-avatar-rail {
+
   width: 100%;
+
   background: rgba(117, 169, 139, 0.3);
+
 }
+
+
 
 .scroll-avatar-fill {
+
   max-width: 100%;
+
   background: linear-gradient(
+
     90deg,
+
     #56866B,
+
     #A9D2B2,
+
     #D8FFE3
+
   );
+
   box-shadow: 0 0 12px rgba(117, 169, 139, 0.4);
+
 }
+
+
 
 .scroll-avatar {
+
   position: absolute;
+
   bottom: 0;
+
   width: 90px;
+
   height: 90px;
+
   object-fit: contain;
+
   transform: translateX(-50%);
+
   filter: drop-shadow(0 3px 9px rgba(0, 0, 0, 0.35));
+
   transition: left 0.1s linear;
+
 }
+
+
 
 /* ========================================
+
    INTRO SCREEN
-======================================== */
+
+\======================================== */
+
+
 
 .intro-screen {
+
   position: fixed;
+
   inset: 0;
+
   z-index: 9999;
+
   overflow: hidden;
+
   isolation: isolate;
 
+
+
   background:
+
     radial-gradient(
+
       ellipse at 50% 75%,
+
       #244b37 0%,
+
       transparent 48%
+
     ),
+
     radial-gradient(
+
       ellipse at 15% 15%,
+
       #172b25 0%,
+
       transparent 45%
+
     ),
+
     linear-gradient(
+
       135deg,
+
       #07130f,
+
       #10251c 55%,
+
       #08140f
+
     );
+
+
 
   animation: intro-disappear 0.6s ease 3.5s forwards;
+
 }
 
+
+
 .intro-screen::before {
+
   content: "";
+
   position: absolute;
+
   inset: 0;
+
   z-index: -1;
 
+
+
   background-image:
+
     linear-gradient(
+
       rgba(169, 210, 178, 0.07) 1px,
+
       transparent 1px
+
     ),
+
     linear-gradient(
+
       90deg,
+
       rgba(169, 210, 178, 0.07) 1px,
+
       transparent 1px
+
     );
+
+
 
   background-size: 55px 55px;
 
+
+
   mask-image: linear-gradient(
+
     transparent,
+
     black 30%,
+
     black 80%,
+
     transparent
+
   );
 
+
+
   animation: grid-move 15s linear infinite;
+
 }
+
+
 
 .intro-screen::after {
+
   content: "";
+
   position: absolute;
+
   width: 450px;
+
   height: 450px;
+
   border-radius: 50%;
 
+
+
   background: rgba(86, 134, 107, 0.2);
+
   filter: blur(100px);
 
+
+
   left: 50%;
+
   top: 55%;
+
   transform: translate(-50%, -50%);
+
   z-index: -1;
+
 }
 
+
+
 /* ========================================
+
    INTRO SPEECH BUBBLE
-======================================== */
+
+\======================================== */
+
+
 
 .speech-bubble {
+
   position: absolute;
+
   top: 22%;
+
   left: 50%;
+
   transform: translateX(-50%);
 
+
+
   width: max-content;
+
   max-width: 90%;
+
   padding: 22px 30px;
 
+
+
   border: 1px solid rgba(169, 210, 178, 0.35);
+
   border-radius: 20px;
 
+
+
   background: rgba(15, 35, 27, 0.82);
+
   backdrop-filter: blur(18px);
 
+
+
   color: #f0f7ef;
+
   text-align: center;
+
+
 
   box-shadow: 0 0 40px rgba(117, 169, 139, 0.12);
 
+
+
   animation: bubble-appear 0.7s ease both;
+
 }
+
+
 
 .speech-bubble p {
+
   margin: 0 0 7px;
+
   font-size: clamp(17px, 2.5vw, 22px);
+
   font-weight: 600;
+
 }
+
+
 
 .speech-bubble strong {
+
   color: #A9D2B2;
+
   font-size: clamp(16px, 2vw, 19px);
+
 }
 
+
+
 /* ========================================
+
    INTRO RUNNING AVATAR
-======================================== */
+
+\======================================== */
+
+
 
 .runner-track {
+
   position: absolute;
+
   bottom: 12%;
+
   left: 0;
 
+
+
   animation: cross-screen 4s linear forwards;
+
 }
+
+
 
 .avatar-sprite {
+
   width: 180px;
+
   height: 220px;
 
+
+
   background-image: url("/avatar-run.gif");
+
   background-size: contain;
+
   background-position: center;
+
   background-repeat: no-repeat;
 
+
+
   filter: drop-shadow(
+
     0 0 18px rgba(169, 210, 178, 0.22)
+
   );
+
 }
 
+
+
 .runner-track::after {
+
   content: "";
+
   position: absolute;
+
   bottom: 0;
+
   left: 15%;
 
+
+
   width: 130px;
+
   height: 12px;
 
+
+
   border-radius: 50%;
+
   background: #A9D2B2;
 
+
+
   filter: blur(18px);
+
   opacity: 0.45;
+
+}
+
+
+
+/* ========================================
+
+   INTRO LOADING STATUS
+
+\======================================== */
+
+
+
+.intro-status {
+
+  position: absolute;
+
+  bottom: 35px;
+
+  left: 50%;
+
+  transform: translateX(-50%);
+
+
+
+  color: #B4C8B8;
+
+  font-size: 11px;
+
+  letter-spacing: 3px;
+
+  text-align: center;
+
+  white-space: nowrap;
+
+}
+
+
+
+.intro-status::after {
+
+  content: "";
+
+  display: block;
+
+
+
+  width: 180px;
+
+  height: 2px;
+
+  margin: 12px auto 0;
+
+
+
+  background: linear-gradient(
+
+    90deg,
+
+    #56866B,
+
+    #D8FFE3
+
+  );
+
+
+
+  transform-origin: left;
+
+  animation: loading-bar 3.5s linear forwards;
+
+}
+
+
+
+/* ========================================
+
+   ANIMATIONS
+
+\======================================== */
+
+
+
+@keyframes cross-screen {
+
+  from {
+
+    transform: translateX(-200px);
+
+  }
+
+
+
+  to {
+
+    transform: translateX(100vw);
+
+  }
+
+}
+
+
+
+@keyframes grid-move {
+
+  from {
+
+    background-position: 0 0;
+
+  }
+
+
+
+  to {
+
+    background-position: 55px 55px;
+
+  }
+
+}
+
+
+
+@keyframes bubble-appear {
+
+  from {
+
+    opacity: 0;
+
+    transform: translate(-50%, 20px);
+
+  }
+
+
+
+  to {
+
+    opacity: 1;
+
+    transform: translate(-50%, 0);
+
+  }
+
+}
+
+
+
+@keyframes loading-bar {
+
+  from {
+
+    transform: scaleX(0);
+
+  }
+
+
+
+  to {
+
+    transform: scaleX(1);
+
+  }
+
+}
+
+
+
+@keyframes intro-disappear {
+
+  to {
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    pointer-events: none;
+
+  }
+
+}
+
+
+
+/* ========================================
+
+   MOBILE ADJUSTMENTS
+
+\======================================== */
+
+
+
+@media (max-width: 480px) {
+
+  .scroll-avatar-track {
+
+  position: fixed;
+
+  z-index: 110;
+
+  bottom: 0;
+
+  left: 45px;
+
+  right: 45px;
+
+  height: 95px;
+
+  pointer-events: none;
+
+}
+
+
+
+  .scroll-avatar {
+
+  position: absolute;
+
+  bottom: 0;
+
+  width: 90px;
+
+  height: 90px;
+
+  object-fit: contain;
+
+  transform: translateX(-50%);
+
+  filter: drop-shadow(0 3px 9px rgba(0, 0, 0, 0.35));
+
+  transition: left 0.1s linear;
+
+}
+
+
+
+  .scroll-avatar-rail,
+
+  .scroll-avatar-fill {
+
+    bottom: 13px;
+
+  }
+
+
+
+  .intro-status {
+
+    font-size: 9px;
+
+    letter-spacing: 2px;
+
+  }
+
+
+
+  .speech-bubble {
+
+    padding: 18px 20px;
+
+  }
+
+
+
+  .avatar-sprite {
+
+    width: 140px;
+
+    height: 180px;
+
+  }
+
+}
+
+
+
+/* ========================================
+
+   REDUCED MOTION ACCESSIBILITY
+
+\======================================== */
+
+
+
+@media (prefers-reduced-motion: reduce) {
+
+  html {
+
+    scroll-behavior: auto;
+
+  }
+
+
+
+  .gradient-text,
+
+  .intro-screen::before,
+
+  .intro-status::after,
+
+  .runner-track {
+
+    animation: none;
+
+  }
+
+
+
+  .scroll-avatar {
+
+    transition: none;
+
+  }
+
 }
 
 /* ========================================
-   INTRO LOADING STATUS
-======================================== */
 
-.intro-status {
+   HANGING PULL-CORD THEME SWITCH
+
+\======================================== */
+
+
+
+.theme-rope {
+
   position: absolute;
-  bottom: 35px;
+
+  top: calc(100% - 10px);
+
+  right: 76px;
+
+
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+
+
+  width: 42px;
+
+  height: 105px;
+
+  padding: 0;
+
+
+
+  border: none;
+
+  background: transparent;
+
+  cursor: pointer;
+
+  overflow: visible;
+
+  z-index: 60;
+
+}
+
+@media (max-width: 767px) {
+
+  .theme-rope {
+
+    right: 52px;
+
+    width: 36px;
+
+  }
+
+}
+
+
+
+.rope-line {
+
+  width: 2px;
+
+  height: 68px;
+
+  border-radius: 10px;
+
+
+
+  background: linear-gradient(
+
+    to right,
+
+    #737373,
+
+    #e5e7eb,
+
+    #737373
+
+  );
+
+
+
+  transform-origin: top;
+
+  transition: height 0.2s ease;
+
+}
+
+
+
+.rope-handle {
+
+  width: 19px;
+
+  height: 27px;
+
+  margin-top: -2px;
+
+
+
+  border-radius: 7px 7px 11px 11px;
+
+  background: linear-gradient(135deg, #10b981, #047857);
+
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+
+
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+
+
+  transition: transform 0.2s ease, background 0.3s ease
+
+}
+
+
+
+.rope-grip {
+
+  width: 5px;
+
+  height: 12px;
+
+  border-radius: 5px;
+
+  background: rgba(255, 255, 255, 0.55);
+
+}
+
+
+
+.theme-rope:hover .rope-handle {
+
+  transform: translateY(4px);
+
+}
+
+
+
+.theme-rope:active .rope-handle {
+
+  transform: translateY(13px);
+
+}
+
+
+
+.theme-rope:active .rope-line {
+
+  height: 76px;
+
+}
+
+
+
+.theme-rope.is-light .rope-handle {
+
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+
+}
+
+
+
+@media (max-width: 480px) {
+
+  .theme-rope {
+
+    right: 78px;
+
+    height: 85px;
+
+  }
+
+
+
+  .rope-line {
+
+    height: 52px;
+
+  }
+
+
+
+  .theme-rope:active .rope-line {
+
+    height: 60px;
+
+  }
+
+}
+
+
+
+@media (prefers-reduced-motion: reduce) {
+
+  .theme-rope,
+
+  .rope-line,
+
+  .rope-handle {
+
+    transition: none;
+
+  }
+
+}
+
+
+
+.custom-cursor {
+
+  position: fixed;
+
+  top: 0;
+
+  left: 0;
+
+  width: 30px;
+
+  height: 30px;
+
+  border: 1px solid rgba(169, 210, 178, 0.55);
+
+  border-radius: 50%;
+
+  background: rgba(169, 210, 178, 0.08);
+
+  box-shadow: 0 0 25px rgba(169, 210, 178, 0.15);
+
+  pointer-events: none;
+
+  z-index: 99999;
+
+  transform: translate3d(-100px, -100px, 0);
+
+  margin-left: -15px;
+
+  margin-top: -15px;
+
+  transition:
+
+    width 0.25s ease,
+
+    height 0.25s ease,
+
+background 0.25s ease,
+
+    border-color 0.25s ease;
+
+}
+
+
+
+.custom-cursor.cursor-hover {
+
+  width: 48px;
+
+  height: 48px;
+
+  background: rgba(169, 210, 178, 0.15);
+
+  border-color: rgba(169, 210, 178, 0.9);
+
+}
+
+
+
+@media (pointer: coarse) {
+
+  .custom-cursor {
+
+    display: none;
+
+  }
+
+}
+
+
+
+@media (prefers-reduced-motion: reduce) {
+
+  .custom-cursor {
+
+    transition: none;
+
+  }
+
+}
+
+
+
+/* =================================
+
+   REALITY SWITCH — SCI-FI MODE
+
+\================================= */
+
+
+
+.reality-mode {
+
+  background-image:
+
+    radial-gradient(
+
+      ellipse at 15% 20%,
+
+      rgba(0, 255, 140, 0.13),
+
+      transparent 45%
+
+    ),
+
+    radial-gradient(
+
+      ellipse at 85% 75%,
+
+      rgba(0, 190, 120, 0.10),
+
+      transparent 40%
+
+    ),
+
+    linear-gradient(
+
+      135deg,
+
+      #050B09 0%,
+
+      #091710 50%,
+
+      #030806 100%
+
+    ) !important;
+
+
+
+  background-attachment: fixed;
+
+  color: #C8FFD8;
+
+}
+
+
+
+/* Sci-fi text selection */
+
+
+
+.reality-mode ::selection {
+
+  background: rgba(0, 255, 140, 0.35);
+
+  color: #FFFFFF;
+
+}
+
+
+
+/* Futuristic scrollbar */
+
+
+
+.reality-mode::-webkit-scrollbar-thumb {
+
+  background: #20C978;
+
+  border-radius: 20px;
+
+}
+
+
+
+.reality-mode::-webkit-scrollbar-track {
+
+  background: #050B09;
+
+}
+
+
+
+/* Reduced motion accessibility */
+
+
+
+@media (prefers-reduced-motion: reduce) {
+
+  .reality-mode {
+
+    transition: none !important;
+
+  }
+
+}
+
+
+
+/* =================================
+
+   HOLOGRAPHIC PROJECT CARDS
+
+\================================= */
+
+
+
+[data-holographic] {
+
+  position: relative;
+
+  isolation: isolate;
+
+  overflow: hidden;
+
+  transition:
+
+    transform 0.35s ease,
+
+    border-color 0.35s ease,
+
+    box-shadow 0.35s ease;
+
+}
+
+
+
+/* Glowing holographic border */
+
+
+
+[data-holographic]:hover {
+
+  transform: translateY(-6px);
+
+  border-color: rgba(169, 210, 178, 0.65);
+
+  box-shadow:
+
+    0 15px 45px rgba(0, 0, 0, 0.16),
+
+    0 0 25px rgba(70, 255, 160, 0.10);
+
+}
+
+
+
+/* Moving holographic shine */
+
+
+
+[data-holographic]::before {
+
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  z-index: -1;
+
+  pointer-events: none;
+
+  background: linear-gradient(
+
+    115deg,
+
+    transparent 20%,
+
+    rgba(169, 210, 178, 0.12) 45%,
+
+    transparent 70%
+
+  );
+
+  transform: translateX(-100%);
+
+  transition: transform 0.7s ease;
+
+}
+
+
+
+[data-holographic]:hover::before {
+
+  transform: translateX(100%);
+
+}
+
+
+
+/* Stronger glow in Reality Mode */
+
+
+
+.reality-mode [data-holographic]:hover {
+
+  border-color: rgba(0, 255, 150, 0.8);
+
+  box-shadow:
+
+    0 0 20px rgba(0, 255, 150, 0.12),
+
+    0 15px 45px rgba(0, 0, 0, 0.35);
+
+}
+
+
+
+@media (prefers-reduced-motion: reduce) {
+
+  [data-holographic],
+
+  [data-holographic]::before {
+
+    transition: none;
+
+  }
+
+}
+
+
+
+/* REALITY MODE — ACTIVE HOLOGRAPHIC CARDS */
+
+
+
+.reality-mode [data-holographic] {
+
+  background:
+
+    linear-gradient(
+
+      145deg,
+
+      rgba(0, 255, 150, 0.10),
+
+      rgba(5, 20, 13, 0.92) 55%,
+
+      rgba(0, 180, 110, 0.08)
+
+    ) !important;
+
+
+
+  border-color: rgba(0, 255, 150, 0.30);
+
+
+
+  box-shadow:
+
+    inset 0 0 30px rgba(0, 255, 150, 0.035),
+
+    0 0 18px rgba(0, 255, 150, 0.06);
+
+}
+
+
+
+/* Subtle technical grid */
+
+
+
+.reality-mode [data-holographic]::after {
+
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  z-index: -1;
+
+  pointer-events: none;
+
+
+
+  background-image:
+
+    linear-gradient(rgba(0, 255, 150, 0.045) 1px, transparent 1px),
+
+    linear-gradient(90deg, rgba(0, 255, 150, 0.045) 1px, transparent 1px);
+
+
+
+  background-size: 28px 28px;
+
+}
+
+
+
+/* Reality mode hover enhancement */
+
+
+
+.reality-mode [data-holographic]:hover {
+
+  border-color: rgba(0, 255, 150, 0.85);
+
+
+
+  box-shadow:
+
+    0 0 30px rgba(0, 255, 150, 0.18),
+
+    inset 0 0 35px rgba(0, 255, 150, 0.08);
+
+}
+
+/* =================================
+
+   TYPOGRAPHY — MINIMALIST LUXURY
+
+\================================= */
+
+
+
+body {
+
+  font-family: var(--font-body), sans-serif;
+
+}
+
+
+
+h1,
+
+h2,
+
+h3,
+
+h4,
+
+h5,
+
+h6 {
+
+  font-family: var(--font-heading), sans-serif;
+
+}
+
+
+
+/* Preserve the technical developer aesthetic */
+
+
+
+code,
+
+pre,
+
+.font-mono {
+
+  font-family: var(--font-geist-mono), monospace;
+
+}
+
+
+
+/* =====================================================
+   SWARIT.OS BOOT SCREEN — CONSOLIDATED
+   Matches the current BootScreen.tsx class names
+===================================================== */
+.boot-screen{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(22px,4vh,36px);padding:clamp(18px,4vw,32px);overflow:auto;isolation:isolate;color:#eaf1e5;background:#0b1712;font-family:var(--font-geist-mono),monospace;animation:boot-fade-in .55s ease both}
+.boot-screen::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(rgba(90,255,180,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(90,255,180,.045) 1px,transparent 1px);background-size:42px 42px;mask-image:radial-gradient(ellipse,#000,transparent 82%);animation:boot-grid-move 24s linear infinite}
+.boot-logo{font-family:var(--font-heading),sans-serif;font-size:clamp(25px,5vw,48px);font-weight:750;letter-spacing:.13em;text-align:center;color:#eaf1e5;text-shadow:0 0 28px rgba(100,230,160,.16);animation:boot-logo-reveal .8s ease both}
+.boot-logo span{color:#8be0ad}
+.boot-window{width:min(100%,620px);overflow:hidden;border:1px solid rgba(139,224,173,.28);border-radius:16px;background:rgba(5,15,10,.88);backdrop-filter:blur(16px);box-shadow:0 24px 80px rgba(0,0,0,.28),0 0 35px rgba(80,220,150,.07);animation:boot-window-reveal .7s .08s ease both}
+.boot-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;background:rgba(139,224,173,.06);border-bottom:1px solid rgba(139,224,173,.14)}
+.boot-dots{display:flex;gap:7px}.boot-dots span{width:9px;height:9px;border-radius:50%}.boot-dots span:nth-child(1){background:#f87171}.boot-dots span:nth-child(2){background:#fbbf24}.boot-dots span:nth-child(3){background:#4ade80}
+.boot-title{font-size:11px;letter-spacing:.12em;color:#8be0ad}
+.boot-terminal{min-height:220px;padding:clamp(20px,4vw,30px);font-size:clamp(11px,2vw,13px);line-height:2}
+.boot-line{color:#c8d8ca;overflow-wrap:anywhere;animation:boot-line-reveal .28s ease both}.boot-prompt{color:#8be0ad;margin-right:7px}
+.boot-cursor{display:inline-block;width:7px;height:1em;margin-left:5px;vertical-align:-.15em;background:#8be0ad;animation:boot-cursor-blink .8s steps(2) infinite}
+.boot-success{margin-top:24px;text-align:center;font-size:clamp(12px,2.4vw,15px);font-weight:650;letter-spacing:.12em;color:#8be0ad;animation:boot-success-reveal .5s ease both}
+.boot-footer{font-size:10px;letter-spacing:.18em;text-align:center;color:rgba(139,224,173,.55)}
+@keyframes boot-fade-in{from{opacity:0}to{opacity:1}}@keyframes boot-logo-reveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}@keyframes boot-window-reveal{from{opacity:0;transform:translateY(15px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes boot-line-reveal{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}@keyframes boot-cursor-blink{50%{opacity:0}}@keyframes boot-success-reveal{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}@keyframes boot-grid-move{to{background-position:42px 42px}}
+@media(max-width:480px){.boot-screen{gap:24px}.boot-terminal{min-height:210px}.boot-header{padding:12px 14px}}
+@media(prefers-reduced-motion:reduce){.boot-screen,.boot-screen::before,.boot-logo,.boot-window,.boot-line,.boot-cursor,.boot-success{animation:none!important}.boot-line,.boot-success{opacity:1;transform:none}}
+
+/* =========================================
+
+   THEME ROPE — CLEAN RESPONSIVE VERSION
+
+\========================================= */
+
+
+
+.theme-rope {
+
+  position: absolute;
+
+  top: calc(100% - 8px);
+
+  right: 20px;
+
+
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+
+
+  width: 42px;
+
+  height: 100px;
+
+  padding: 0;
+
+
+
+  border: 0;
+
+  outline: none;
+
+  background: transparent;
+
+
+
+  cursor: pointer;
+
+  overflow: visible;
+
+  z-index: 60;
+
+
+
+  touch-action: manipulation;
+
+  -webkit-tap-highlight-color: transparent;
+
+}
+
+
+
+.rope-line {
+
+  width: 2px;
+
+  height: 65px;
+
+  flex-shrink: 0;
+
+
+
+  border-radius: 999px;
+
+
+
+  background: linear-gradient(
+
+    90deg,
+
+    #737373,
+
+    #e5e7eb,
+
+    #737373
+
+  );
+
+
+
+  transform-origin: top center;
+
+  transition: height 0.22s ease;
+
+}
+
+
+
+.rope-handle {
+
+  width: 20px;
+
+  height: 28px;
+
+  margin-top: -1px;
+
+  flex-shrink: 0;
+
+
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+
+
+  border-radius: 7px 7px 11px 11px;
+
+
+
+  background: linear-gradient(
+
+    135deg,
+
+    #10b981,
+
+    #047857
+
+  );
+
+
+
+  box-shadow:
+
+    0 4px 12px rgba(16, 185, 129, 0.35),
+
+    inset 0 1px 1px rgba(255, 255, 255, 0.25);
+
+
+
+  transition:
+
+    transform 0.22s cubic-bezier(.2, .8, .2, 1),
+
+background 0.3s ease,
+
+    box-shadow 0.3s ease;
+
+}
+
+
+
+.rope-grip {
+
+  width: 5px;
+
+  height: 12px;
+
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.6);
+
+}
+
+
+
+/* Hover */
+
+@media (hover: hover) {
+
+  .theme-rope:hover .rope-handle {
+
+    transform: translateY(5px);
+
+  }
+
+}
+
+
+
+/* Pull interaction */
+
+.theme-rope:active .rope-handle {
+
+  transform: translateY(13px);
+
+}
+
+
+
+.theme-rope:active .rope-line {
+
+  height: 73px;
+
+}
+
+
+
+/* Light mode handle */
+
+.theme-rope.is-light .rope-handle {
+
+  background: linear-gradient(
+
+    135deg,
+
+    #f59e0b,
+
+    #d97706
+
+  );
+
+
+
+  box-shadow:
+
+    0 4px 12px rgba(245, 158, 11, 0.35),
+
+    inset 0 1px 1px rgba(255, 255, 255, 0.25);
+
+}
+
+
+
+/* Mobile positioning */
+
+@media (max-width: 767px) {
+
+  .theme-rope {
+
+    right: 16px;
+
+    width: 36px;
+
+    height: 88px;
+
+  }
+
+
+
+  .rope-line {
+
+    height: 55px;
+
+  }
+
+
+
+  .theme-rope:active .rope-line {
+
+    height: 63px;
+
+  }
+
+}
+
+
+
+/* Accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .theme-rope,
+
+  .rope-line,
+
+  .rope-handle {
+
+    transition: none !important;
+
+  }
+
+}
+
+
+/* =========================================
+   SWARIT.OS — BOOT SCREEN LAYOUT FIX
+========================================= */
+
+.boot-window {
+  width: min(100%, 620px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.boot-header {
+  position: relative;
+  min-height: 54px;
+  box-sizing: border-box;
+}
+
+.boot-title {
+  position: absolute;
   left: 50%;
   transform: translateX(-50%);
-
-  color: #B4C8B8;
-  font-size: 11px;
-  letter-spacing: 3px;
-  text-align: center;
   white-space: nowrap;
 }
 
-.intro-status::after {
-  content: "";
-  display: block;
-
-  width: 180px;
-  height: 2px;
-  margin: 12px auto 0;
-
-  background: linear-gradient(
-    90deg,
-    #56866B,
-    #D8FFE3
-  );
-
-  transform-origin: left;
-  animation: loading-bar 3.5s linear forwards;
+.boot-terminal {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 245px;
+  padding: 28px 30px;
+  flex: 1;
 }
 
-/* ========================================
-   ANIMATIONS
-======================================== */
+.boot-line {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
 
-@keyframes cross-screen {
-  from {
-    transform: translateX(-200px);
+.boot-progress-section {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20px 30px 24px;
+  border-top: 1px solid rgba(169, 210, 178, 0.15);
+}
+
+.boot-progress-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: #a9d2b2;
+}
+
+.boot-progress-info span:last-child {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #eaf1e5;
+}
+
+.boot-progress-track {
+  width: 100%;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(169, 210, 178, 0.12);
+}
+
+.boot-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #56866b, #75dba1);
+  box-shadow: 0 0 12px rgba(117, 219, 161, 0.35);
+  transition: width 500ms ease;
+}
+
+.boot-status {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 14px;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: rgba(169, 210, 178, 0.65);
+}
+
+.boot-status-dot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #75dba1;
+  box-shadow: 0 0 8px rgba(117, 219, 161, 0.4);
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .boot-screen {
+    padding: 20px;
+    gap: 28px;
   }
 
-  to {
-    transform: translateX(100vw);
+  .boot-logo {
+    font-size: clamp(22px, 7vw, 34px);
+    text-align: center;
+  }
+
+  .boot-header {
+    padding: 14px 15px;
+  }
+
+  .boot-dots {
+    gap: 5px;
+  }
+
+  .boot-dots span {
+    width: 8px;
+    height: 8px;
+  }
+
+  .boot-version {
+    font-size: 10px;
+  }
+
+  .boot-terminal {
+    min-height: 220px;
+    padding: 24px 18px;
+    font-size: 12px;
+  }
+
+  .boot-progress-section {
+    padding: 18px 18px 22px;
+  }
+
+  .boot-progress-info {
+    font-size: 10px;
   }
 }
 
-@keyframes grid-move {
-  from {
-    background-position: 0 0;
-  }
-
-  to {
-    background-position: 55px 55px;
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .boot-progress-fill {
+    transition: none;
   }
 }
 
-@keyframes bubble-appear {
-  from {
-    opacity: 0;
-    transform: translate(-50%, 20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-}
-
-@keyframes loading-bar {
-  from {
-    transform: scaleX(0);
-  }
-
-  to {
-    transform: scaleX(1);
-  }
-}
-
-@keyframes intro-disappear {
-  to {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-  }
-}
-
-/* ========================================
-   MOBILE ADJUSTMENTS
-======================================== */
-
-@media (max-width: 480px) {
-  .scroll-avatar-track {
+/* ==========================================
+   SWARIT.OS — RUNNING AVATAR SCROLL PROGRESS
+========================================== */
+.website-scroll-progress {
   position: fixed;
-  z-index: 110;
+  top: auto;
   bottom: 0;
-  left: 45px;
-  right: 45px;
-  height: 95px;
+  left: 0;
+  width: 100%;
+  height: 62px;
+  z-index: 999999;
   pointer-events: none;
 }
 
-  .scroll-avatar {
+.website-scroll-progress-track {
   position: absolute;
-  bottom: 0;
-  width: 90px;
-  height: 90px;
+  left: 40px;
+  right: 40px;
+  top: 0;
+  height: 62px;
+}
+
+/* Progress line */
+
+.website-scroll-progress-fill {
+  position: absolute;
+  left: 0;
+  bottom: 9px;
+  width: 0%;
+  height: 3px;
+  border-radius: 10px;
+  background: var(--accent-color, #75dba1);
+  box-shadow: 0 0 10px rgba(117, 219, 161, 0.5);
+  transition: width 100ms linear;
+}
+
+/* Running avatar */
+
+.website-scroll-avatar {
+  position: absolute;
+  top: 0;
+  width: 76px;
+  height: 51px;
   object-fit: contain;
+  object-position: center;
   transform: translateX(-50%);
-  filter: drop-shadow(0 3px 9px rgba(0, 0, 0, 0.35));
-  transition: left 0.1s linear;
+  transition: left 100ms linear;
+  will-change: left;
+  user-select: none;
 }
 
-  .scroll-avatar-rail,
-  .scroll-avatar-fill {
-    bottom: 13px;
-  }
+/* Mobile */
 
-  .intro-status {
-    font-size: 9px;
-    letter-spacing: 2px;
-  }
-
-  .speech-bubble {
-    padding: 18px 20px;
-  }
-
-  .avatar-sprite {
-    width: 140px;
-    height: 180px;
-  }
-}
-
-/* ========================================
-   REDUCED MOTION ACCESSIBILITY
-======================================== */
-
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
-  .gradient-text,
-  .intro-screen::before,
-  .intro-status::after,
-  .runner-track {
-    animation: none;
-  }
-
-  .scroll-avatar {
-    transition: none;
-  }
-}
-/* Pull-cord theme switch */
-.theme-rope {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 42px;
-  height: 105px;
-  padding: 0;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  overflow: visible;
-  z-index: 50;
-}
-
-.rope-line {
-  width: 2px;
-  height: 65px;
-  background: linear-gradient(
-    to bottom,
-    #a3a3a3,
-    #d1d5db,
-    #737373
-  );
-  border-radius: 10px;
-  transform-origin: top;
-  transition: height 0.25s ease;
-}
-
-.rope-handle {
-  width: 18px;
-  height: 27px;
-  margin-top: -2px;
-  border-radius: 8px 8px 11px 11px;
-  background: linear-gradient(135deg, #10b981, #047857);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.25s ease;
-}
-
-.rope-grip {
-  width: 5px;
-  height: 12px;
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.theme-rope:hover .rope-handle {
-  transform: translateY(4px);
-}
-
-.theme-rope:active .rope-handle {
-  transform: translateY(12px);
-}
-
-.theme-rope:active .rope-line {
-  height: 73px;
-}
-
-.theme-rope.is-light .rope-handle {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .theme-rope,
-  .rope-line,
-  .rope-handle {
-    transition: none;
-  }
-}
-
-/* ========================================
-   HANGING PULL-CORD THEME SWITCH
-======================================== */
-
-.theme-rope {
-  position: absolute;
-  top: calc(100% - 10px);
-  right: 28px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  width: 42px;
-  height: 105px;
-  padding: 0;
-
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  overflow: visible;
-  z-index: 60;
-}
-
-.rope-line {
-  width: 2px;
-  height: 68px;
-  border-radius: 10px;
-
-  background: linear-gradient(
-    to right,
-    #737373,
-    #e5e7eb,
-    #737373
-  );
-
-  transform-origin: top;
-  transition: height 0.2s ease;
-}
-
-.rope-handle {
-  width: 19px;
-  height: 27px;
-  margin-top: -2px;
-
-  border-radius: 7px 7px 11px 11px;
-  background: linear-gradient(135deg, #10b981, #047857);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  transition: transform 0.2s ease, background 0.3s ease;
-}
-
-.rope-grip {
-  width: 5px;
-  height: 12px;
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.55);
-}
-
-.theme-rope:hover .rope-handle {
-  transform: translateY(4px);
-}
-
-.theme-rope:active .rope-handle {
-  transform: translateY(13px);
-}
-
-.theme-rope:active .rope-line {
-  height: 76px;
-}
-
-.theme-rope.is-light .rope-handle {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
-}
-
-@media (max-width: 480px) {
-  .theme-rope {
-    right: 78px;
-    height: 85px;
-  }
-
-  .rope-line {
+@media (max-width: 600px) {
+  .website-scroll-progress {
     height: 52px;
   }
 
-  .theme-rope:active .rope-line {
-    height: 60px;
+  .website-scroll-progress-track {
+    left: 30px;
+    right: 30px;
+    height: 52px;
+  }
+
+  .website-scroll-avatar {
+    width: 64px;
+    height: 43px;
+  }
+
+  .website-scroll-progress-fill {
+    bottom: 7px;
+    height: 2px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .theme-rope,
-  .rope-line,
-  .rope-handle {
+  .website-scroll-progress-fill,
+  .website-scroll-avatar {
     transition: none;
   }
+}
+/* Hide website scroll progress during boot screen */
+
+body:has(.boot-screen) .website-scroll-progress {
+  display: none !important;
+}.heading-highlight {
+  display: inline;
+  white-space: nowrap;
+}
+
+.selected-work-title {
+  white-space: nowrap;
+}
+.selected-work-title {
+  font-size: clamp(42px, 5.2vw, 68px);
+  line-height: 1.12;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.heading-highlight {
+  display: inline;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .selected-work-title {
+    font-size: clamp(32px, 7vw, 46px);
+    white-space: normal;
+  }
+}
+/* ==========================================
+   SWARIT.OS — PREMIUM WARM LIGHT THEME
+========================================== */
+
+.light-theme {
+  color-scheme: light;
+  background: #F5F0E6;
+  color: #30332E;
+
+  --background: #F5F0E6;
+  --foreground: #30332E;
+
+  --card-background: #FBF8F1;
+  --section-background: #EAE3D5;
+
+  --text-primary: #30332E;
+  --text-secondary: #77766D;
+
+  --border-color: #DED8CB;
+  --accent-color: #477C5C;
+
+  --surface-hover: #EDE8DD;
+  --shadow-color: rgba(77, 65, 45, 0.08);
+
+  --surface-glass: rgba(255, 255, 255, 0.48);
+  --surface-border: rgba(112, 104, 82, 0.16);
+}
+/* ==========================================
+   SWARIT.OS — LIGHT MODE FOUNDATION
+========================================== */
+
+.light-theme {
+  background-color: #F5F0E6 !important;
+  color: #30332E;
+}
+
+/* Main page background */
+html:has(.light-theme),
+body:has(.light-theme) {
+  background: #F5F0E6;
+}
+
+/* Smooth theme transition */
+.light-theme,
+.light-theme * {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 250ms;
+  transition-timing-function: ease;
+}
+/* PREMIUM WARM LIGHT MODE FOUNDATION */
+
+.light-theme {
+  background-color: #F5F0E6;
+  color: #30332E;
+  color-scheme: light;
+
+  --background: #F5F0E6;
+  --foreground: #30332E;
+  --card-background: #FBF8F1;
+  --section-background: #EAE3D5;
+  --text-primary: #30332E;
+  --text-secondary: #77766D;
+  --border-color: #DED8CB;
+  --accent-color: #477C5C;
+}
+
+html:has(.light-theme),
+body:has(.light-theme) {
+  background-color: #F5F0E6;
 }
